@@ -1,0 +1,4 @@
+Flask==1.0.2
+beautifulsoup4==4.6.3
+google-cloud-translate==1.4.0
+gunicorn==19.9.0
