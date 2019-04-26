@@ -8,48 +8,35 @@ https://gitlab.com/kirbylife/
 import re
 from urllib.parse import quote
 
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup
 from flask import Flask, render_template, request
+from google.cloud import translate
 from requests import get, post
 
-
-def _translate(text):
-    '''
-    Use the free API endpoint of Google translate to translate (Daahhh)
-    if the answer is not a json it means that the IP is sending many requests and it does not work
-    '''
-    url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q="
-    text = quote(text)
-    response = get(url + text)
-    try:
-        response = response.json()
-    except:
-        return "Servicio no disponible por el momento :c intenta mas tarde"
-
-    return "".join([i[0] for i in response[0]])
+client = translate.Client(target_language="es")
 
 
 def translate(html_element):
     '''
     Split the full article into the child elements because the free google translate api has a character limit.
     '''
-    childs = html_element.children
-    for child in childs:
-        if not isinstance(child, NavigableString):
-            child_text = child.text
-            text_translated = _translate(child_text)
-            child_text = str(child).replace(child_text, text_translated)
-            child.replace_with(child_text)
-
-    text_translated = str(html_element)
+    response = client.translate(
+        str(html_element), source_language="en", format_="html")
+    text_translated = response["translatedText"]
 
     # Replace the "<Space>." and "<Space>," with only the punctuation sign
     text_translated = re.sub(r"\s(,|\.)", "\g<1>", text_translated)
 
     # Replace the "usted" for "tú"
     text_translated = re.sub(r".sted", "tu", text_translated, re.IGNORECASE)
-    text_translated = text_translated.replace("&lt;", "<")
-    text_translated = text_translated.replace("&gt;", ">")
+
+    #Remove the whitespaces befora and after a slash
+    text_translated = re.sub(r"\s?(/)", "\g<1>", text_translated)
+    text_translated = re.sub(r"(/)\s?", "\g<1>", text_translated)
+
+    text_translated = text_translated.replace("https//", "https://")
+    text_translated = text_translated.replace(" = ", "=")
+
     return text_translated
 
 
