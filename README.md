@@ -16,5 +16,5 @@
 
 ## Deploy
 1) declares an environment variable with the path to the .json file of the Google translate api-key
-2) Execute "gunicorn -b 0.0.0.0:8000 app:app"
+2) Execute `gunicorn -b 0.0.0.0:8000 app:app`
 
