@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 '''
 Written originally by @kirbylife
 This is a program to translate the articles of the english Mozilla blog to spanish.
@@ -53,7 +54,7 @@ def get_article(url):
     author = page.address
     if author:
         author = author.text.strip()
-        author_quote = f'''<p>Esta es una traducción del <a href="{url}">artículo original</a> realizado por {author}</p>'''
+        author_quote = '''<p>Esta es una traducción del <a href="{url}">artículo original</a> realizado por {author}</p>'''
         article_translated = author_quote + "\n" + article_translated
     return article_translated
 
